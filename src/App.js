@@ -68,3 +68,8 @@ export default App;
 
 // git checkout -b <unique_branch_name> -- creates a new branch
 // git branch --- see what branch you're in
+
+
+// git config user.name "<username>"
+// git config user.email "<git_email>"
+//<ESC>   :wq --- to quit terminal text editor(VIM) 
