@@ -61,6 +61,7 @@ class App extends Component {
 export default App;
 
 
+// Git instructions
 // git add * --- Adds files youwant to commit
 // git status --- check to see if all the files you want to commit is green
 // git commit -m "YOUR MESSAGE HERE, what did you change" --- add message to your commit
