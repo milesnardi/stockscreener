@@ -10,22 +10,27 @@ class App extends Component {
     this.state = {
       pe0: '',
       pe1: '',
+      pe2: '',
     }
   }
 
   makerequest(){
     var ticker = document.getElementById("userInput").value;
 
-    var params0 = {
+    var params1 = {
       apikey: "5NO4O6TFSS7HI49J",
       symbol: ticker,
       function: "GLOBAL_QUOTE"
     };
 
-    var params1 = {
+    var params2 = {
       'apikey': 'be7dda93ccb9ac20646c41d6a13bf6ee',
       'symbols': ticker,
       'fields': 'fiftyTwoWkHigh,fiftyTwoWkHighDate,fiftyTwoWkLow,fiftyTwoWkLowDate',
+    };
+
+    var params3 = {
+      api_key: "6zGKFKTs-6NW8L4WwgQ9"
     };
 
     var axiosInstance0 = axios.create({
@@ -34,17 +39,23 @@ class App extends Component {
 
     var axiosInstance1 = axios.create({
       baseURL: "https://www.alphavantage.co/query",
-      params: params0
+      params: params1
     });
 
 
     var axiosInstance2 = axios.create({
       baseURL: "https://marketdata.websol.barchart.com/getQuote.json",
-      params: params1
+      params: params2
+    });
+
+    var axiosInstance3 = axios.create({
+      baseURL:"https://www.quandl.com/api/v3/datasets/EOD/" + ticker + "/data.json",
+      params: params3
     });
 
     var price0 = 0;
     var price1 = 0;
+    var price2 = 0;
     var earnings = 0;
     var promises = [];
 
@@ -62,13 +73,19 @@ class App extends Component {
       price1 = response.data.results[0].close;
     }))
 
+    promises.push(axiosInstance3.get().then(response => {
+      price2 = response.data.dataset_data.data[0][4];
+    }))
+
     Promise.all(promises).then (response => {
       this.setState({
         pe0: price0/earnings,
         pe1: price1/earnings,
+        pe2: price2/earnings,
       });
       document.getElementById("output0").innerHTML = ticker + ": " + this.state.pe0;
       document.getElementById("output1").innerHTML = ticker + ": " + this.state.pe1;
+      document.getElementById("output2").innerHTML = ticker + ": " + this.state.pe2;
     })
   }
 
@@ -94,6 +111,7 @@ class App extends Component {
           <button onClick={this.makerequest} >S u b m i t</button>
           <p id="output0"> </p>
           <p id="output1"> </p>
+          <p id="output2"> </p>
         </header>
       </div>
     );
