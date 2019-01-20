@@ -14,22 +14,11 @@ class App extends Component {
 
   makerequest(){
     var ticker = document.getElementById("userInput").value;
-    var date = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
-    var year = today.getFullYear()-1
-    var month = today.getMonth()
-    var day = today.getDate()
 
     var params0 = {
       apikey: "5NO4O6TFSS7HI49J",
       symbol: ticker,
       function: "GLOBAL_QUOTE"
-    };
-
-    var params1 = {
-      apikey: "acd48ecfe4b1feeb9a3b172dccb65787",
-      symbols: ticker,
-      startdate: year+"-"+month+"-"+day,
-      endDate: date
     };
 
     var axiosInstance0 = axios.create({
@@ -39,11 +28,6 @@ class App extends Component {
     var axiosInstance1 = axios.create({
       baseURL: "https://www.alphavantage.co/query",
       params: params0
-    });
-    
-    var axiosInstance2 = axios.create({
-      baseURL: "https://marketdata.websol.barchart.com/service?wsdl",
-      params: params1
     });
 
     var price = 0;
@@ -65,18 +49,28 @@ class App extends Component {
   }
 
   testBarchart() {
-    var onDemand = new OnDemandClient();
+    var params = {
+      'apikey': 'be7dda93ccb9ac20646c41d6a13bf6ee',
+      'symbols': 'AAPL',
+      'fields': 'fiftyTwoWkHigh,fiftyTwoWkHighDate,fiftyTwoWkLow,fiftyTwoWkLowDate',
+    };
 
-    onDemand.setAPIKey('acd48ecfe4b1feeb9a3b172dccb65787');
-    onDemand.setJsonP(true);
+    var notOnDemand = axios.create({
+      baseURL: "https://marketdata.websol.barchart.com/getQuote.json",
+      params: params
+    });
+
+    notOnDemand.get().then(response => {
+      console.log(response.data.results);
+    });
 
     /* get a quote for AAPL and GOOG */
-    onDemand.getQuote({symbols: 'AAPL,GOOG'}, function (err, data) {
+    /*onDemand.getQuote({symbols: 'AAPL,GOOG'}, function (err, data) {
         var quotes = data.results;
         for (x in quotes) {
             console.log("getQuote: " + quotes[x].symbol + " [" + quotes[x].name + "] = " + JSON.stringify(quotes[x]));
         }
-});
+    });*/
   }
 
   render() {
