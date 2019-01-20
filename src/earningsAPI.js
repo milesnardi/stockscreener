@@ -10,6 +10,7 @@ class App extends Component {
     this.state = {
       pe0: '',
       pe1: '',
+      marketcap: '',
     }
   }
 
@@ -43,10 +44,19 @@ class App extends Component {
       params: params1
     });
 
+    var axiosInstance10 = axios.create({
+      baseURL: "https://api.iextrading.com/1.0/stock/" + ticker + "/stats",
+    });
+
+
+
     var price0 = 0;
     var price1 = 0;
     var earnings = 0;
     var promises = [];
+    var marketcap = 0;
+
+
 
     promises.push(axiosInstance0.get().then (response => {
       earnings = response.data["earnings"][0]["actualEPS"] + 
@@ -61,16 +71,23 @@ class App extends Component {
     promises.push(axiosInstance2.get().then(response => {
       price1 = response.data.results[0].close;
     }))
+    promises.push(axiosInstance10.get().then (response => {
+      marketcap = response.data["marketcap"]; 
+    }))
+
 
     Promise.all(promises).then (response => {
       this.setState({
         pe0: price0/earnings,
         pe1: price1/earnings,
+        marketcap: marketcap,
       });
       document.getElementById("output0").innerHTML = ticker + ": " + this.state.pe0;
       document.getElementById("output1").innerHTML = ticker + ": " + this.state.pe1;
-    })
+      document.getElementById("output10").innerHTML = ticker + ": " + this.state.marketcap;
+    });
   }
+
 
   render() {
     return (
@@ -94,6 +111,8 @@ class App extends Component {
           <button onClick={this.makerequest} >S u b m i t</button>
           <p id="output0"> </p>
           <p id="output1"> </p>
+          <p id="output10"> </p>
+
         </header>
       </div>
     );
