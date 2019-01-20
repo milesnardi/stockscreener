@@ -13,8 +13,9 @@ class App extends Component {
   }
 
   makerequest(){
+    var ticker = document.getElementById("userInput").value;
+    console.log("TICKER: " + ticker);
 
-    var ticker = '';
     var params = {
       apikey: "5NO4O6TFSS7HI49J",
       symbol: ticker,
@@ -52,19 +53,15 @@ class App extends Component {
         this.setState({
           pe: price/earnings
         });
+        document.getElementById("TickerAndPE").innerHTML = ticker + ": " + this.state.pe;
       // stop the spinner
       })
       // stop the spinner
     })
   }
 
-  tryStuff() {
-    console.log("User Input value: " + document.getElementById("form1").value);
-    
-  }
-
   render() {
-    var peVariable = this.state.pe
+    //var peVariable = this.state.pe
     return (
       <div className="App">
         <header className="App-header">
@@ -80,13 +77,11 @@ class App extends Component {
           >
             Learn React
           </a>
-          
-          <p>MSFT: {peVariable}</p>
-          <form id="form1">
-            Ticker:
-            <input type="value"/>
-            <button onClick={this.tryStuff} >S u b m i t</button>
-          </form> 
+        
+          Ticker:
+          <input type="text" id="userInput"/>
+          <button onClick={this.makerequest} >S u b m i t</button>
+          <p id="TickerAndPE"> </p>
         </header>
       </div>
     );
