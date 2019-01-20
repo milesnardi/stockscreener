@@ -30,21 +30,41 @@ class App extends Component {
       params: params0
     });
 
+    var params2 = {
+      'apikey': 'be7dda93ccb9ac20646c41d6a13bf6ee',
+      'symbols': 'AAPL',
+      'fields': 'fiftyTwoWkHigh,fiftyTwoWkHighDate,fiftyTwoWkLow,fiftyTwoWkLowDate',
+    };
+
+    var axiosInstance2 = axios.create({
+      baseURL: "https://marketdata.websol.barchart.com/getQuote.json",
+      params: params2
+    });
+
     var price = 0;
     var earnings = 0;
+    var close = 0;
+    var promises = [];
 
-    axiosInstance0.get().then (response => {
+    promises.push(axiosInstance0.get().then (response => {
       earnings = response.data["earnings"][0]["actualEPS"] + 
       response.data["earnings"][1]["actualEPS"] + response.data["earnings"][2]["actualEPS"] +
       response.data["earnings"][3]["actualEPS"];
-      
-      axiosInstance1.get().then (response => {
-        price = response.data["Global Quote"]["08. previous close"];
-        this.setState({
-          pe: price/earnings
-        });
-        document.getElementById("TickerAndPE").innerHTML = ticker + ": " + this.state.pe;
-      })
+    }))
+
+    promises.push(axiosInstance1.get().then (response => {
+      price = response.data["Global Quote"]["08. previous close"];
+    }))
+
+    promises.push(axiosInstance2.get().then(response => {
+      close = response.data.results[0].close;
+    }))
+
+    Promise.all(promises).then (response => {
+      this.setState({
+        pe: price/earnings
+      });
+      document.getElementById("TickerAndPE").innerHTML = ticker + ": " + this.state.pe;
     })
   }
 
