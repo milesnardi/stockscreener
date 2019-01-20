@@ -14,12 +14,22 @@ class App extends Component {
 
   makerequest(){
     var ticker = document.getElementById("userInput").value;
-    console.log("TICKER: " + ticker);
+    var date = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+    var year = today.getFullYear()-1
+    var month = today.getMonth()
+    var day = today.getDate()
 
-    var params = {
+    var params0 = {
       apikey: "5NO4O6TFSS7HI49J",
       symbol: ticker,
       function: "GLOBAL_QUOTE"
+    };
+
+    var params1 = {
+      apikey: "acd48ecfe4b1feeb9a3b172dccb65787",
+      symbols: ticker,
+      startdate: year+"-"+month+"-"+day,
+      endDate: date
     };
 
     var axiosInstance0 = axios.create({
@@ -28,40 +38,48 @@ class App extends Component {
 
     var axiosInstance1 = axios.create({
       baseURL: "https://www.alphavantage.co/query",
-      params: params
+      params: params0
     });
     
+    var axiosInstance2 = axios.create({
+      baseURL: "https://marketdata.websol.barchart.com/service?wsdl",
+      params: params1
+    });
+
     var price = 0;
     var earnings = 0;
 
-    // Start a spinner
     axiosInstance0.get().then (response => {
-      console.log("First request finished");
-      console.log(JSON.stringify(response.data));
-      console.log(JSON.stringify(response.data["earnings"][0]["actualEPS"]));
       earnings = response.data["earnings"][0]["actualEPS"] + 
       response.data["earnings"][1]["actualEPS"] + response.data["earnings"][2]["actualEPS"] +
       response.data["earnings"][3]["actualEPS"];
-      console.log("Earnings: " + earnings);
-
-       // Start a spinner
+      
       axiosInstance1.get().then (response => {
-        console.log("2nd request finished");
-        console.log(JSON.stringify(response.data["Global Quote"]["08. previous close"]));
         price = response.data["Global Quote"]["08. previous close"];
-        console.log("Price: " + price);
         this.setState({
           pe: price/earnings
         });
         document.getElementById("TickerAndPE").innerHTML = ticker + ": " + this.state.pe;
-      // stop the spinner
       })
-      // stop the spinner
     })
   }
 
+  testBarchart() {
+    var onDemand = new OnDemandClient();
+
+    onDemand.setAPIKey('acd48ecfe4b1feeb9a3b172dccb65787');
+    onDemand.setJsonP(true);
+
+    /* get a quote for AAPL and GOOG */
+    onDemand.getQuote({symbols: 'AAPL,GOOG'}, function (err, data) {
+        var quotes = data.results;
+        for (x in quotes) {
+            console.log("getQuote: " + quotes[x].symbol + " [" + quotes[x].name + "] = " + JSON.stringify(quotes[x]));
+        }
+});
+  }
+
   render() {
-    //var peVariable = this.state.pe
     return (
       <div className="App">
         <header className="App-header">
@@ -78,6 +96,8 @@ class App extends Component {
             Learn React
           </a>
         
+          <button onClick={this.testBarchart} >TEST</button>
+
           Ticker:
           <input type="text" id="userInput"/>
           <button onClick={this.makerequest} >S u b m i t</button>
