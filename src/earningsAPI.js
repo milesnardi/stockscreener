@@ -13,24 +13,22 @@ class App extends Component {
   }
 
   makerequest(){
-    var params = {
-      apikey: "5NO4O6TFSS7HI49J",
-      symbol: "MSFT",
-      function: "GLOBAL_QUOTE"
-    };
 
     var axiosInstance = axios.create({
-      baseURL: "https://www.alphavantage.co/query",
-      params: params
+      baseURL: "https://api.iextrading.com/1.0/stock/aapl/earnings",
     });
     // Start a spinner
     axiosInstance.get().then (response => {
-      console.log(JSON.stringify(response.data["Global Quote"]["08. previous close"]));
+      console.log(JSON.stringify(response.data));
+      console.log(JSON.stringify(response.data["earnings"][0]["actualEPS"]));
       this.setState({
-        close: JSON.stringify(response.data["Global Quote"]["08. previous close"])
+        close: JSON.stringify(response.data["earnings"][0]["actualEPS"] + 
+        response.data["earnings"][1]["actualEPS"] + response.data["earnings"][2]["actualEPS"] +
+        response.data["earnings"][3]["actualEPS"])
       })
       // stop the spinner
     })
+    
   }
 
   render() {
@@ -53,6 +51,7 @@ class App extends Component {
           <input type = "text"
                  id = "myText"
                  value = "text here" />
+
           <button onClick={this.makerequest} >S u b m i t</button>
           <p>MSFT: {closeVariable}</p>
         </header>
