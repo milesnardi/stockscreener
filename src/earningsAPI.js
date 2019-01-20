@@ -8,7 +8,8 @@ class App extends Component {
     super(props);
     this.makerequest = this.makerequest.bind(this);
     this.state = {
-      pe: 'Click Submit',
+      pe0: '',
+      pe1: '',
     }
   }
 
@@ -21,6 +22,12 @@ class App extends Component {
       function: "GLOBAL_QUOTE"
     };
 
+    var params1 = {
+      'apikey': 'be7dda93ccb9ac20646c41d6a13bf6ee',
+      'symbols': ticker,
+      'fields': 'fiftyTwoWkHigh,fiftyTwoWkHighDate,fiftyTwoWkLow,fiftyTwoWkLowDate',
+    };
+
     var axiosInstance0 = axios.create({
       baseURL: "https://api.iextrading.com/1.0/stock/" + ticker + "/earnings",
     });
@@ -30,20 +37,15 @@ class App extends Component {
       params: params0
     });
 
-    var params2 = {
-      'apikey': 'be7dda93ccb9ac20646c41d6a13bf6ee',
-      'symbols': 'AAPL',
-      'fields': 'fiftyTwoWkHigh,fiftyTwoWkHighDate,fiftyTwoWkLow,fiftyTwoWkLowDate',
-    };
 
     var axiosInstance2 = axios.create({
       baseURL: "https://marketdata.websol.barchart.com/getQuote.json",
-      params: params2
+      params: params1
     });
 
-    var price = 0;
+    var price0 = 0;
+    var price1 = 0;
     var earnings = 0;
-    var close = 0;
     var promises = [];
 
     promises.push(axiosInstance0.get().then (response => {
@@ -53,44 +55,21 @@ class App extends Component {
     }))
 
     promises.push(axiosInstance1.get().then (response => {
-      price = response.data["Global Quote"]["08. previous close"];
+      price0 = response.data["Global Quote"]["08. previous close"];
     }))
 
     promises.push(axiosInstance2.get().then(response => {
-      close = response.data.results[0].close;
+      price1 = response.data.results[0].close;
     }))
 
     Promise.all(promises).then (response => {
       this.setState({
-        pe: price/earnings
+        pe0: price0/earnings,
+        pe1: price1/earnings,
       });
-      document.getElementById("TickerAndPE").innerHTML = ticker + ": " + this.state.pe;
+      document.getElementById("output0").innerHTML = ticker + ": " + this.state.pe0;
+      document.getElementById("output1").innerHTML = ticker + ": " + this.state.pe1;
     })
-  }
-
-  testBarchart() {
-    var params = {
-      'apikey': 'be7dda93ccb9ac20646c41d6a13bf6ee',
-      'symbols': 'AAPL',
-      'fields': 'fiftyTwoWkHigh,fiftyTwoWkHighDate,fiftyTwoWkLow,fiftyTwoWkLowDate',
-    };
-
-    var notOnDemand = axios.create({
-      baseURL: "https://marketdata.websol.barchart.com/getQuote.json",
-      params: params
-    });
-
-    notOnDemand.get().then(response => {
-      console.log(response.data.results);
-    });
-
-    /* get a quote for AAPL and GOOG */
-    /*onDemand.getQuote({symbols: 'AAPL,GOOG'}, function (err, data) {
-        var quotes = data.results;
-        for (x in quotes) {
-            console.log("getQuote: " + quotes[x].symbol + " [" + quotes[x].name + "] = " + JSON.stringify(quotes[x]));
-        }
-    });*/
   }
 
   render() {
@@ -109,13 +88,12 @@ class App extends Component {
           >
             Learn React
           </a>
-        
-          <button onClick={this.testBarchart} >TEST</button>
 
           Ticker:
           <input type="text" id="userInput"/>
           <button onClick={this.makerequest} >S u b m i t</button>
-          <p id="TickerAndPE"> </p>
+          <p id="output0"> </p>
+          <p id="output1"> </p>
         </header>
       </div>
     );
