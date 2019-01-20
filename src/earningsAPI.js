@@ -13,7 +13,6 @@ class App extends Component {
   }
 
   makerequest(){
-    console.log("User Input value: " + document.getElementById("form1").value)
 
     var ticker = '';
     var params = {
@@ -59,6 +58,11 @@ class App extends Component {
     })
   }
 
+  tryStuff() {
+    console.log("User Input value: " + document.getElementById("form1").value);
+    
+  }
+
   render() {
     var peVariable = this.state.pe
     return (
@@ -78,9 +82,10 @@ class App extends Component {
           </a>
           
           <p>MSFT: {peVariable}</p>
-          <form id="form1" onSubmit={this.makerequest}>
+          <form id="form1">
             Ticker:
-            <input type="text"/>
+            <input type="value"/>
+            <button onClick={this.tryStuff} >S u b m i t</button>
           </form> 
         </header>
       </div>
