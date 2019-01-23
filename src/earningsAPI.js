@@ -8,33 +8,60 @@ class App extends Component {
     super(props);
     this.makerequest = this.makerequest.bind(this);
     this.state = {
-      close: 'Click Submit!'
+      pe: 'Click Submit',
     }
   }
 
   makerequest(){
+    var ticker = document.getElementById("userInput").value;
+    console.log("TICKER: " + ticker);
+
     var params = {
       apikey: "5NO4O6TFSS7HI49J",
-      symbol: "MSFT",
+      symbol: ticker,
       function: "GLOBAL_QUOTE"
     };
 
-    var axiosInstance = axios.create({
+    var axiosInstance0 = axios.create({
+      baseURL: "https://api.iextrading.com/1.0/stock/" + ticker + "/earnings",
+    });
+
+    var axiosInstance1 = axios.create({
       baseURL: "https://www.alphavantage.co/query",
       params: params
     });
+    
+    var price = 0;
+    var earnings = 0;
+
     // Start a spinner
-    axiosInstance.get().then (response => {
-      console.log(JSON.stringify(response.data["Global Quote"]["08. previous close"]));
-      this.setState({
-        close: JSON.stringify(response.data["Global Quote"]["08. previous close"])
+    axiosInstance0.get().then (response => {
+      console.log("First request finished");
+      console.log(JSON.stringify(response.data));
+      console.log(JSON.stringify(response.data["earnings"][0]["actualEPS"]));
+      earnings = response.data["earnings"][0]["actualEPS"] + 
+      response.data["earnings"][1]["actualEPS"] + response.data["earnings"][2]["actualEPS"] +
+      response.data["earnings"][3]["actualEPS"];
+      console.log("Earnings: " + earnings);
+
+       // Start a spinner
+      axiosInstance1.get().then (response => {
+        console.log("2nd request finished");
+        console.log(JSON.stringify(response.data["Global Quote"]["08. previous close"]));
+        price = response.data["Global Quote"]["08. previous close"];
+        console.log("Price: " + price);
+        this.setState({
+          pe: price/earnings
+        });
+        document.getElementById("TickerAndPE").innerHTML = ticker + ": " + this.state.pe;
+      // stop the spinner
       })
       // stop the spinner
     })
   }
 
   render() {
-    var closeVariable = this.state.close
+    //var peVariable = this.state.pe
     return (
       <div className="App">
         <header className="App-header">
@@ -50,11 +77,11 @@ class App extends Component {
           >
             Learn React
           </a>
-          <input type = "text"
-                 id = "myText"
-                 value = "text here" />
+        
+          Ticker:
+          <input type="text" id="userInput"/>
           <button onClick={this.makerequest} >S u b m i t</button>
-          <p>MSFT: {closeVariable}</p>
+          <p id="TickerAndPE"> </p>
         </header>
       </div>
     );
